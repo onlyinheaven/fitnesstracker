@@ -1,0 +1,14 @@
+# 用户配置文件
+config.json
+
+# 用户数据目录
+record/
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# 操作系统文件
+.DS_Store
+Thumbs.db

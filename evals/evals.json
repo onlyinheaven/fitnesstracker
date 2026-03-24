@@ -1,0 +1,41 @@
+{
+  "skill_name": "fitness-tracker",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "今天卧推 80kg 做了 8 个，做了 4 组",
+      "expected_output": "调用 fitness_manager.py record 记录卧推数据，然后自动调用 analyze 展示训练报告",
+      "files": [],
+      "expectations": [
+        "调用了 fitness_manager.py record 命令记录卧推数据",
+        "记录的参数包含: 卧推, 80kg, 8, 4",
+        "记录成功后自动调用了 analyze 命令展示卧推训练报告",
+        "输出中包含记录成功的确认信息"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "帮我记录深蹲 100kg 8次 3组，然后再记录硬拉 120kg 5次 3组，最后给我看今天的训练报告",
+      "expected_output": "依次记录深蹲和硬拉，每次记录后调用 analyze，最后调用 summary 展示每日报告",
+      "files": [],
+      "expectations": [
+        "调用了 fitness_manager.py record 记录深蹲 100kg 8次 3组",
+        "调用了 fitness_manager.py record 记录硬拉 120kg 5次 3组",
+        "调用了 fitness_manager.py summary 展示每日训练报告",
+        "输出中包含深蹲和硬拉两个动作的总结信息"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "刚才卧推记错了，帮我删掉最后一条卧推记录，然后重新记录卧推 85kg 6次 3组",
+      "expected_output": "先调用 delete 删除卧推最后一条记录，再调用 record 重新记录新数据",
+      "files": [],
+      "expectations": [
+        "调用了 fitness_manager.py delete 卧推 删除最后一条卧推记录",
+        "调用了 fitness_manager.py record 重新记录卧推 85kg 6次 3组",
+        "输出中包含删除成功的确认信息",
+        "输出中包含新记录成功的确认信息"
+      ]
+    }
+  ]
+}
