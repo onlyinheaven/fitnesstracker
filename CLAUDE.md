@@ -79,6 +79,23 @@ There is no linter, build step, or automated test runner. Evaluation cases are i
 
 不需要分发的文件（如 `CLAUDE.md`、`evals/`、`scripts/bump_version.sh`、`.gitignore`）列在 `exclude_from_dist` 中仅供参考，不影响安装流程。
 
+## Windows GBK 编码规范
+
+Windows 终端默认使用 GBK 编码，无法输出中文和 emoji，会导致 `UnicodeEncodeError`。**所有 Python 脚本必须在模块顶部（import 之后、业务代码之前）添加以下编码修复：**
+
+```python
+import io
+import sys
+
+# Windows GBK 终端下强制 UTF-8 输出，避免中文和 emoji 编码错误
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+if sys.stderr.encoding and sys.stderr.encoding.lower() != "utf-8":
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+```
+
+新增或修改 Python 脚本时必须确认包含此修复，stdout 和 stderr 都要处理。
+
 ## 测试规范
 
 **禁止在用户真实数据库上做测试。** 所有测试临时文件统一放在项目路径下的 `tmp/` 目录中（已在 `.gitignore` 中排除）。

@@ -8,8 +8,8 @@
         },
         {
             "path": "VERSION",
-            "md5": "767d37b8cd3cc61dc0863616207d6d42",
-            "size": 103
+            "md5": "821411c2f9bd41d1cc338bddd6787721",
+            "size": 110
         },
         {
             "path": "manifest.json",
@@ -33,18 +33,18 @@
         },
         {
             "path": "scripts/rest_timer.py",
-            "md5": "225cb4447fd6a2ad181efba59d079366",
-            "size": 1635
+            "md5": "f5a3df74e915e21c887fb018b44c6816",
+            "size": 1844
         },
         {
             "path": "scripts/install.py",
-            "md5": "ca7d15bb226594417af32e7d619d15f0",
-            "size": 6839
+            "md5": "16aabd6b2a0844568d7b0255703162e3",
+            "size": 7205
         },
         {
             "path": "scripts/changelog.py",
-            "md5": "c99141e15a290e8c16c79e483550e99a",
-            "size": 5232
+            "md5": "c138584cdb146da09dab619461b1ef3f",
+            "size": 5635
         }
     ],
     "directories": [

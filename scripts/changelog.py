@@ -7,10 +7,17 @@
     python scripts/changelog.py generate
 """
 
+import io
 import json
 import os
 import sys
 from datetime import date
+
+# Windows GBK 终端下强制 UTF-8 输出，避免中文和 emoji 编码错误
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+if sys.stderr.encoding and sys.stderr.encoding.lower() != "utf-8":
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(SCRIPT_DIR)

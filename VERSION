@@ -1,4 +1,4 @@
 0.8.0
-commit: ba94d84
+commit: d615434
 date: 2026-03-29
-message: feat: 安装/更新逻辑迁移到独立 Python 脚本
+message: feat: manifest MD5 校验、自举更新、增量更新日志
