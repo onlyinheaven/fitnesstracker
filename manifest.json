@@ -3,13 +3,13 @@
     "files": [
         {
             "path": "SKILL.md",
-            "md5": "893687c0eeeb0a97ebddbee8d4f028fc",
-            "size": 13579
+            "md5": "723796b8eb4ad9a9539659c7863e1ac7",
+            "size": 13358
         },
         {
             "path": "VERSION",
-            "md5": "1afe3f17729e7db34e8da8608f35b07f",
-            "size": 97
+            "md5": "f1bfd6c0d380ee94a17ac9ae08995787",
+            "size": 115
         },
         {
             "path": "manifest.json",
@@ -45,10 +45,16 @@
             "path": "scripts/changelog.py",
             "md5": "c138584cdb146da09dab619461b1ef3f",
             "size": 5635
+        },
+        {
+            "path": "references/output_formats.md",
+            "md5": "e67ca3eb419fc4bc076bfb7e6a340136",
+            "size": 2565
         }
     ],
     "directories": [
-        "scripts"
+        "scripts",
+        "references"
     ],
     "exclude_from_dist": [
         "CLAUDE.md",

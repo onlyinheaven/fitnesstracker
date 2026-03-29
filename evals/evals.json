@@ -78,6 +78,37 @@
         "输出中包含共同训练项目的变化对比",
         "输出中列出仅某一天有的训练项目"
       ]
+    },
+    {
+      "id": 8,
+      "prompt": "帮我设置组间歇提醒 2 分钟",
+      "expected_output": "调用 timer 2min 开启组间歇提醒",
+      "files": [],
+      "expectations": [
+        "调用了 timer 2min 命令",
+        "输出中包含组间歇提醒已开启的确认信息",
+        "输出中提及间隔 2min"
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "现在间歇计时是开着的还是关着的？",
+      "expected_output": "调用 timer（无参数）查看当前状态",
+      "files": [],
+      "expectations": [
+        "调用了 timer 命令（无参数）",
+        "输出中显示当前计时器状态（开启或关闭）"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "关掉间歇提醒",
+      "expected_output": "调用 timer off 关闭组间歇提醒",
+      "files": [],
+      "expectations": [
+        "调用了 timer off 命令",
+        "输出中包含组间歇提醒已关闭的确认信息"
+      ]
     }
   ]
 }
