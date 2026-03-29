@@ -184,30 +184,52 @@ compatibility: 需要 Python 3.x 和文件系统访问权限（用于存储 SQLi
 
 ### 清单驱动机制
 
-所有需要分发的文件由 `manifest.json` 统一管理。安装脚本根据此清单自动比较版本并复制文件。
+所有需要分发的文件由 `manifest.json` 统一管理，包含每个文件的 MD5 和 size 用于完整性校验。
 
 **`manifest.json` 结构：**
 ```json
 {
-    "version": "0.6.0",
-    "files": ["SKILL.md", "VERSION", "manifest.json", "scripts/fitness_manager.py", "scripts/rest_timer.py", "scripts/install.py"],
+    "version": "0.8.0",
+    "files": [
+        {"path": "SKILL.md", "md5": "a1b2c3...", "size": 12345},
+        {"path": "VERSION", "md5": "d4e5f6...", "size": 77},
+        {"path": "manifest.json", "md5": null, "size": null},
+        {"path": "scripts/fitness_manager.py", "md5": "...", "size": 38152},
+        ...
+    ],
     "directories": ["scripts"]
 }
 ```
 
+> `manifest.json` 自身的 md5/size 为 null（无法自引用），通过字节比对校验。
 > `config.json`、`record/`、`.timer_pid`、`.timer_alert` 是运行时自动生成的，不在分发清单中。
 
 ---
 
-### 安装/更新命令
+### 安装/更新流程
 
-从源路径（即本仓库/skill 所在目录）运行安装脚本：
+源路径记为 `SOURCE`（本仓库/skill 源目录），目标路径记为 `TARGET`（用户安装目录）。
 
-```bash
-python <源路径>/scripts/install.py <目标路径>
+**核心原则：先拿到工具，再用工具干活。**
+
+```
+步骤 1: 从 SOURCE 复制 SKILL.md → TARGET（Skill 的核心，始终第一个更新）
+
+步骤 2: 检查 TARGET 是否具备安装工具
+        需要: scripts/install.py, manifest.json
+        如果缺少 → 从 SOURCE 复制到 TARGET（创建 scripts/ 目录如需要）
+
+步骤 3: 运行安装脚本完成剩余文件的安装和 MD5 校验
+        python <TARGET>/scripts/install.py <SOURCE> <TARGET>
 ```
 
-脚本自动完成：版本比较 → 版本一致则跳过 → 版本不同则按 manifest 创建目录并复制文件。
+安装脚本自动完成：
+1. 复制源 manifest.json 为临时参考文件
+2. 比对是否需要更新（manifest MD5 比对 + 逐文件校验）
+3. 从源复制所有文件到目标
+4. 逐文件 MD5+size 校验确认完整性
+5. 输出本版本更新日志
+6. 清理临时文件
 
 **Claude Code 默认安装路径：**
 - **Linux / macOS**: `~/.claude/skills/fitness-tracker/`
@@ -215,10 +237,36 @@ python <源路径>/scripts/install.py <目标路径>
 
 **示例：**
 ```bash
-python scripts/install.py ~/.claude/skills/fitness-tracker
+python scripts/install.py /path/to/source ~/.claude/skills/fitness-tracker
 ```
 
 适用于所有工具（Claude Code、Gemini CLI、QClaw 等），只需将目标路径替换为对应工具的 Skill 目录。
+
+---
+
+### 修复
+
+当用户反馈 Skill 功能异常（如脚本报错、文件损坏、功能缺失等），执行修复流程：
+
+```bash
+python <TARGET>/scripts/install.py <SOURCE> <TARGET>
+```
+
+与安装/更新使用同一脚本。脚本会自动逐文件 MD5 校验，仅替换损坏或缺失的文件不会影响用户的 `config.json` 和 `record/` 数据。
+
+如果 `scripts/install.py` 本身损坏或缺失，回退到安装流程的步骤 1-2（从源补齐工具后再运行）。
+
+- **触发**: "skill 好像坏了"、"修复一下 fitness tracker"、"脚本报错了"
+
+---
+
+### 更新日志
+
+安装/更新完成后会自动输出本版本的更新日志。也可手动查询：
+
+```bash
+python scripts/changelog.py show [version]    # 查询指定版本或全部日志
+```
 
 ---
 

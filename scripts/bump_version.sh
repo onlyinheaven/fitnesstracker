@@ -1,5 +1,5 @@
 #!/bin/bash
-# 更新 VERSION 文件和 manifest.json 中的版本信息
+# 更新 VERSION 文件和 manifest.json 中的版本信息（含 MD5+size）
 # 用法: ./scripts/bump_version.sh [新版本号]
 #   不传版本号时只更新 commit/date/message，保留当前版本号
 
@@ -27,21 +27,60 @@ date: ${DATE}
 message: ${MESSAGE}
 EOF
 
-# 同步更新 manifest.json 中的 version 字段
+echo "VERSION updated: v${NEW_VERSION} (${COMMIT}, ${DATE})"
+echo "  message: ${MESSAGE}"
+
+# 同步更新 manifest.json：版本号 + 文件 MD5+size
 if [ -f "$MANIFEST_FILE" ]; then
     if command -v python3 &>/dev/null; then
         python3 -c "
-import json
-with open('$MANIFEST_FILE', 'r') as f:
+import json, hashlib, os
+
+project_dir = '$PROJECT_DIR'
+manifest_file = '$MANIFEST_FILE'
+new_version = '$NEW_VERSION'
+
+with open(manifest_file, 'r') as f:
     m = json.load(f)
-m['version'] = '$NEW_VERSION'
-with open('$MANIFEST_FILE', 'w') as f:
+
+m['version'] = new_version
+
+# 计算每个文件的 MD5 和 size
+new_files = []
+old_files = m.get('files', [])
+for item in old_files:
+    # 兼容旧格式（纯字符串）和新格式（dict）
+    if isinstance(item, dict):
+        path = item['path']
+    else:
+        path = item
+
+    filepath = os.path.join(project_dir, path)
+
+    # manifest.json 自身无法自引用
+    if path == 'manifest.json':
+        new_files.append({'path': path, 'md5': None, 'size': None})
+        continue
+
+    if os.path.exists(filepath):
+        size = os.path.getsize(filepath)
+        h = hashlib.md5()
+        with open(filepath, 'rb') as f:
+            for chunk in iter(lambda: f.read(8192), b''):
+                h.update(chunk)
+        md5 = h.hexdigest()
+        new_files.append({'path': path, 'md5': md5, 'size': size})
+    else:
+        new_files.append({'path': path, 'md5': None, 'size': None})
+        print(f'  warning: {path} not found, skipping checksum')
+
+m['files'] = new_files
+
+with open(manifest_file, 'w') as f:
     json.dump(m, f, ensure_ascii=False, indent=4)
     f.write('\n')
+
+print(f'manifest.json synced: v{new_version} ({len(new_files)} files with checksums)')
 "
-        echo "manifest.json version synced: ${NEW_VERSION}"
     fi
 fi
-
-echo "VERSION updated: v${NEW_VERSION} (${COMMIT}, ${DATE})"
-echo "  message: ${MESSAGE}"

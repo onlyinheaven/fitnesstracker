@@ -1,12 +1,51 @@
 {
-    "version": "0.7.0",
+    "version": "0.8.0",
     "files": [
-        "SKILL.md",
-        "VERSION",
-        "manifest.json",
-        "scripts/fitness_manager.py",
-        "scripts/rest_timer.py",
-        "scripts/install.py"
+        {
+            "path": "SKILL.md",
+            "md5": "8eb3ebd93893746c5017820d2eca9768",
+            "size": 12631
+        },
+        {
+            "path": "VERSION",
+            "md5": "767d37b8cd3cc61dc0863616207d6d42",
+            "size": 103
+        },
+        {
+            "path": "manifest.json",
+            "md5": null,
+            "size": null
+        },
+        {
+            "path": "changelog.json",
+            "md5": "6ecc7dfd5437861abab95c6afe1a0f6d",
+            "size": 2504
+        },
+        {
+            "path": "CHANGELOG.md",
+            "md5": "1af4247401da886b828b728354c79f08",
+            "size": 1578
+        },
+        {
+            "path": "scripts/fitness_manager.py",
+            "md5": "8be9304c5f4783363f3af551b3bf99c9",
+            "size": 38152
+        },
+        {
+            "path": "scripts/rest_timer.py",
+            "md5": "225cb4447fd6a2ad181efba59d079366",
+            "size": 1635
+        },
+        {
+            "path": "scripts/install.py",
+            "md5": "ca7d15bb226594417af32e7d619d15f0",
+            "size": 6839
+        },
+        {
+            "path": "scripts/changelog.py",
+            "md5": "c99141e15a290e8c16c79e483550e99a",
+            "size": 5232
+        }
     ],
     "directories": [
         "scripts"

@@ -31,9 +31,14 @@ python scripts/fitness_manager.py setpath /new/path --migrate    # Move data
 python scripts/fitness_manager.py version                       # Version + commit info
 python scripts/fitness_manager.py help
 
-# Install/update to target directory
-python scripts/install.py <目标路径>
-python scripts/install.py ~/.claude/skills/fitness-tracker
+# Install/update (source + target)
+python scripts/install.py <源路径> <目标路径>
+python scripts/install.py . ~/.claude/skills/fitness-tracker
+
+# Changelog management
+python scripts/changelog.py add <version> "变更1" "变更2" ...   # Add entry
+python scripts/changelog.py show [version]                       # Query log
+python scripts/changelog.py generate                             # Regenerate CHANGELOG.md
 ```
 
 Available fields: `weight`, `reps`, `sets`, `distance`, `duration`, `incline`.
