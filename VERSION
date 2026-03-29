@@ -1,4 +1,4 @@
 0.8.0
-commit: d615434
+commit: a6360d3
 date: 2026-03-29
-message: feat: manifest MD5 校验、自举更新、增量更新日志
+message: fix: 修复所有脚本的 Windows GBK 编码问题
