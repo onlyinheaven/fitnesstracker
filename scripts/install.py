@@ -5,8 +5,9 @@
 安装流程：复制源 manifest 为临时文件 → 判断是否需要更新 → 安装 → 校验 → 输出更新日志。
 
 用法:
-    python scripts/install.py <源路径> <目标路径>
+    python scripts/install.py <源路径> <目标路径> [--force]
     python scripts/install.py /path/to/repo ~/.claude/skills/fitness-tracker
+    python scripts/install.py /path/to/repo ~/.claude/skills/fitness-tracker --force
 """
 
 import hashlib
@@ -111,7 +112,7 @@ def show_changelog(target_dir, version):
             return
 
 
-def install(source_dir, target_dir):
+def install(source_dir, target_dir, force=False):
     source_dir = os.path.abspath(source_dir)
     target_dir = os.path.abspath(target_dir)
 
@@ -139,9 +140,9 @@ def install(source_dir, target_dir):
                 old_ver = f.readline().strip()
 
         # 步骤 2: 判断是否需要安装
-        need_install = True
-
-        if os.path.exists(dst_manifest):
+        if force:
+            print(f"强制更新模式，覆盖所有文件...")
+        elif os.path.exists(dst_manifest):
             if file_md5(dst_manifest) == file_md5(tmp_manifest):
                 # manifest 完全一致，逐文件校验
                 _, errors = verify_files(target_dir, manifest)
@@ -182,8 +183,10 @@ def install(source_dir, target_dir):
             print("安装不完整，请检查源文件")
             sys.exit(1)
 
-        # 判断安装/更新/修复（基于安装前记录的状态）
-        if not old_ver:
+        # 判断安装/更新/修复/强制更新（基于安装前记录的状态）
+        if force:
+            action = "强制更新"
+        elif not old_ver:
             action = "安装"
         elif old_ver == src_ver:
             action = "修复"
@@ -202,9 +205,13 @@ def install(source_dir, target_dir):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("用法: python scripts/install.py <源路径> <目标路径>")
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    force = "--force" in sys.argv
+
+    if len(args) < 2:
+        print("用法: python scripts/install.py <源路径> <目标路径> [--force]")
         print("示例: python scripts/install.py /path/to/repo ~/.claude/skills/fitness-tracker")
+        print("      python scripts/install.py /path/to/repo ~/.claude/skills/fitness-tracker --force")
         sys.exit(1)
 
-    install(sys.argv[1], sys.argv[2])
+    install(args[0], args[1], force=force)

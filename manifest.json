@@ -3,13 +3,13 @@
     "files": [
         {
             "path": "SKILL.md",
-            "md5": "e5d30a9deb855ac848caeb253e78f38f",
-            "size": 12656
+            "md5": "fba0e7f07699d118ea78560ef2ad8657",
+            "size": 13059
         },
         {
             "path": "VERSION",
-            "md5": "c53c4a47f25ff73e2d2bd0556d931f3f",
-            "size": 96
+            "md5": "6feb3d8e822d5cdb4fa93e032114a436",
+            "size": 121
         },
         {
             "path": "manifest.json",
@@ -38,8 +38,8 @@
         },
         {
             "path": "scripts/install.py",
-            "md5": "16aabd6b2a0844568d7b0255703162e3",
-            "size": 7205
+            "md5": "314aa989ec6ff57d30772aa54aecc787",
+            "size": 7651
         },
         {
             "path": "scripts/changelog.py",

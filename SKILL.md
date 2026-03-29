@@ -253,8 +253,15 @@ python scripts/install.py /path/to/source ~/.claude/skills/fitness-tracker
 | 安装 | "安装 fitness tracker skill" |
 | 更新 | "更新一下这个 skill"、"有新版本吗" |
 | 修复 | "skill 好像坏了"、"修复一下"、"脚本报错了" |
+| 强制更新 | "强制更新 skill"、"重新安装一遍"、"不管版本直接更新" |
 
-> 修复不会影响用户的 `config.json` 和 `record/` 数据。
+> 安装、更新、修复均不会影响用户的 `config.json` 和 `record/` 数据。
+
+**强制更新：** 当用户要求强制更新时，跳过版本比对，直接从步骤 1 开始执行完整流程，从源覆盖所有文件并重新校验。调用时在 install.py 后追加 `--force` 参数：
+
+```bash
+python <TARGET>/scripts/install.py <SOURCE> <TARGET> --force
+```
 
 ---
 
