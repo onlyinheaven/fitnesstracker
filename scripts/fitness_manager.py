@@ -5,6 +5,9 @@ import json
 import re
 import shutil
 import io
+import signal
+import subprocess
+import platform
 from datetime import datetime
 from collections import defaultdict, OrderedDict
 
@@ -63,24 +66,145 @@ def parse_duration_seconds(duration_str):
 SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_FILE = os.path.join(SKILL_DIR, "config.json")
 DEFAULT_LOG_DIR = os.path.join(SKILL_DIR, "record")
+TIMER_PID_FILE = os.path.join(SKILL_DIR, ".timer_pid")
+TIMER_ALERT_FILE = os.path.join(SKILL_DIR, ".timer_alert")
+
+DEFAULT_CONFIG = {
+    "log_dir": DEFAULT_LOG_DIR,
+    "rest_timer": {
+        "enabled": False,
+        "interval": "2min"
+    }
+}
 
 def get_config():
+    config = dict(DEFAULT_CONFIG)
+    config["rest_timer"] = dict(DEFAULT_CONFIG["rest_timer"])
     if os.path.exists(CONFIG_FILE):
         try:
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
+                saved = json.load(f)
+            # 合并已保存的配置，保留默认值作为兜底
+            if "log_dir" in saved:
+                config["log_dir"] = saved["log_dir"]
+            if "rest_timer" in saved and isinstance(saved["rest_timer"], dict):
+                config["rest_timer"].update(saved["rest_timer"])
         except (json.JSONDecodeError, IOError):
             pass
-    return {"log_dir": DEFAULT_LOG_DIR}
+    return config
 
-def save_config(log_dir):
+def save_config_full(config):
     with open(CONFIG_FILE, "w", encoding="utf-8") as f:
-        json.dump({"log_dir": log_dir}, f, ensure_ascii=False, indent=4)
+        json.dump(config, f, ensure_ascii=False, indent=4)
+
+def update_config(**updates):
+    """读取当前配置，合并更新项，写回。"""
+    config = get_config()
+    for k, v in updates.items():
+        if k == "rest_timer" and isinstance(v, dict) and isinstance(config.get("rest_timer"), dict):
+            config["rest_timer"].update(v)
+        else:
+            config[k] = v
+    save_config_full(config)
+    return config
 
 def get_db_paths():
     config = get_config()
     log_dir = os.path.expanduser(config["log_dir"])
     return log_dir, os.path.join(log_dir, "fitness_log.db"), os.path.join(log_dir, "fitness_log.csv")
+
+# ── 组间歇计时器 ─────────────────────────────────────────────
+
+TIMER_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "rest_timer.py")
+
+def parse_interval_seconds(interval_str):
+    """将间隔字符串转换为秒数。支持 '2min', '90s', '1min30s' 等。"""
+    s = interval_str.lower().strip()
+    m = re.match(r'^(?:(\d+)min)?(?:(\d+)s)?$', s)
+    if m and any(m.groups()):
+        total = int(m.group(1) or 0) * 60 + int(m.group(2) or 0)
+        return total if total > 0 else None
+    try:
+        return int(float(s)) * 60  # 纯数字视为分钟
+    except ValueError:
+        return None
+
+def kill_timer():
+    """杀掉正在运行的计时器后台进程。"""
+    if not os.path.exists(TIMER_PID_FILE):
+        return
+    try:
+        with open(TIMER_PID_FILE, "r") as f:
+            pid = int(f.read().strip())
+        os.kill(pid, signal.SIGTERM)
+    except (ProcessLookupError, ValueError, OSError):
+        pass  # 进程已结束或 PID 无效
+    try:
+        os.remove(TIMER_PID_FILE)
+    except OSError:
+        pass
+
+def clear_alert():
+    """清除已有的提醒文件。"""
+    try:
+        os.remove(TIMER_ALERT_FILE)
+    except OSError:
+        pass
+
+def check_alert():
+    """检查并读取提醒文件，返回提醒消息（如有），同时清除文件。"""
+    if not os.path.exists(TIMER_ALERT_FILE):
+        return None
+    try:
+        with open(TIMER_ALERT_FILE, "r", encoding="utf-8") as f:
+            alert = json.load(f)
+        os.remove(TIMER_ALERT_FILE)
+        return alert.get("message")
+    except (json.JSONDecodeError, IOError, OSError):
+        return None
+
+def start_timer(exercise, interval_seconds):
+    """启动后台计时器进程。"""
+    kill_timer()
+    clear_alert()
+    kwargs = {}
+    if platform.system() == "Windows":
+        kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+    else:
+        kwargs["start_new_session"] = True
+    proc = subprocess.Popen(
+        [sys.executable, TIMER_SCRIPT, str(interval_seconds), exercise, TIMER_ALERT_FILE],
+        **kwargs
+    )
+    with open(TIMER_PID_FILE, "w") as f:
+        f.write(str(proc.pid))
+
+def handle_timer_command(args):
+    """处理 timer 命令：查看/设置/关闭。"""
+    config = get_config()
+    timer_cfg = config["rest_timer"]
+
+    if not args:
+        # 查看当前状态
+        if timer_cfg["enabled"]:
+            print(f"⏰ 组间歇提醒: 开启（间隔 {timer_cfg['interval']}）")
+        else:
+            print("⏰ 组间歇提醒: 关闭")
+        return
+
+    arg = args[0].lower()
+    if arg == "off":
+        kill_timer()
+        update_config(rest_timer={"enabled": False})
+        print("⏰ 组间歇提醒已关闭。")
+    else:
+        seconds = parse_interval_seconds(arg)
+        if seconds is None:
+            print(f"❌ 无法识别的时间格式: {arg}")
+            print("   支持格式: 2min, 90s, 1min30s")
+            return
+        update_config(rest_timer={"enabled": True, "interval": arg})
+        print(f"⏰ 组间歇提醒已开启，间隔 {arg}。记录训练后将自动计时。")
 
 # ── 数据库 ────────────────────────────────────────────────
 
@@ -271,6 +395,15 @@ def record(exercise, fields):
             pass
 
     conn.close()
+
+    # 组间歇计时器：记录后自动启动
+    timer_cfg = get_config().get("rest_timer", {})
+    if timer_cfg.get("enabled"):
+        interval_str = timer_cfg.get("interval", "2min")
+        interval_s = parse_interval_seconds(interval_str)
+        if interval_s:
+            start_timer(exercise, interval_s)
+            print(f"⏰ 组间歇计时 {interval_str} 已启动")
 
 def delete_last(exercise=None):
     conn = get_connection()
@@ -719,7 +852,7 @@ def set_path(new_path, migrate=False):
     else:
         print("ℹ️ 将在新路径下从头开始记录（旧数据保留在原路径不受影响）。")
 
-    save_config(new_path)
+    update_config(log_dir=new_path)
     print(f"✅ 存储路径已更新为: {new_path}")
 
 # ── 版本信息 ──────────────────────────────────────────────
@@ -773,6 +906,7 @@ def print_usage():
   summary 开始日期 结束日期                查看多日训练总结
   compare 日期1 日期2                      对比两日训练变化
   setpath "新路径" [--migrate]             修改存储路径
+  timer [间隔|off]                         组间歇提醒（如 timer 2min / timer off）
   version                                  查看版本号和 commit 信息
 
 可用字段 (key=value):
@@ -802,6 +936,11 @@ if __name__ == "__main__":
 
     action = sys.argv[1]
 
+    # 每次调用时检查未读的间歇提醒
+    pending_alert = check_alert()
+    if pending_alert:
+        print(pending_alert)
+
     if action in ("-h", "--help", "help"):
         print_usage()
         sys.exit(0)
@@ -812,7 +951,7 @@ if __name__ == "__main__":
         log_dir = sys.argv[2] if len(sys.argv) > 2 else DEFAULT_LOG_DIR
         if os.path.exists(CONFIG_FILE):
             print(f"⚠️ 已存在配置文件，原路径: {get_config()['log_dir']}，将更新为: {log_dir}")
-        save_config(log_dir)
+        update_config(log_dir=log_dir)
         auto_migrate()
         print(f"🚀 初始化完成，数据将存储在: {log_dir}")
     elif action == "record":
@@ -864,6 +1003,8 @@ if __name__ == "__main__":
             sys.exit(1)
         migrate = "--migrate" in sys.argv
         set_path(sys.argv[2], migrate=migrate)
+    elif action == "timer":
+        handle_timer_command(sys.argv[2:])
     else:
         print(f"❌ 未知命令: {action}")
         print_usage()

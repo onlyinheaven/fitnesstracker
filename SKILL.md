@@ -1,6 +1,6 @@
 ---
 name: fitness-tracker
-description: 当用户提及健身、运动相关内容时触发。包括但不限于：记录力量训练（深蹲、卧推、硬拉、引体向上等）、自重训练（悬垂举腿、平板支撑、俯卧撑等）、有氧运动（游泳、跑步、坡道走、骑行等），查看训练报告或总结，询问历史 PR，查询多日训练记录，对比两天的训练变化，删除或修改记录，修改数据存储路径。支持 kg/lbs 双单位、km/m 距离、灵活时长格式。口语化表达如"今天练了XXX"、"帮我记一下"、"看看上次卧推多少"、"这周练了啥"、"对比一下周一和周三"、"这个skill是什么版本"。
+description: 当用户提及健身、运动相关内容时触发。包括但不限于：记录力量训练（深蹲、卧推、硬拉、引体向上等）、自重训练（悬垂举腿、平板支撑、俯卧撑等）、有氧运动（游泳、跑步、坡道走、骑行等），查看训练报告或总结，询问历史 PR，查询多日训练记录，对比两天的训练变化，删除或修改记录，修改数据存储路径。支持 kg/lbs 双单位、km/m 距离、灵活时长格式。口语化表达如"今天练了XXX"、"帮我记一下"、"看看上次卧推多少"、"这周练了啥"、"对比一下周一和周三"、"这个skill是什么版本"、"设置组间歇提醒"、"打开间歇计时"。
 compatibility: 需要 Python 3.x 和文件系统访问权限（用于存储 SQLite 数据库）
 ---
 
@@ -78,7 +78,15 @@ compatibility: 需要 Python 3.x 和文件系统访问权限（用于存储 SQLi
 - **从头开始**: `python scripts/fitness_manager.py setpath "新路径"`
 - **迁移数据**: `python scripts/fitness_manager.py setpath "新路径" --migrate`
 
-### 9. 版本查询 (Version)
+### 9. 组间歇提醒 (Timer)
+- **开启**: `python scripts/fitness_manager.py timer 2min`（支持 Xmin、Xs、XminYs 格式）
+- **关闭**: `python scripts/fitness_manager.py timer off`
+- **查看状态**: `python scripts/fitness_manager.py timer`
+- **触发**: "设置组间歇提醒2分钟"、"打开间歇计时"、"关掉间歇提醒"
+- **功能**: 开启后，每次 record 记录训练数据后自动启动后台倒计时，到时间后提醒用户。下一次 record 会自动重置计时器。默认关闭，配置保存在 config.json 中。
+- **提醒机制**: 双输出 — 终端直接 print（CLI 用户可见）+ 写入 `.timer_alert` 文件。在 Claude Code/Claw 等工具中，每次调用脚本时会自动检查 `.timer_alert` 文件并输出未读提醒。
+
+### 10. 版本查询 (Version)
 - **调用**: `python scripts/fitness_manager.py version`
 - **触发**: "这个skill是什么版本"、"fitness tracker版本号"、"当前版本"
 - **功能**: 输出当前版本号、对应的 commit 哈希、发布日期和更新说明。
