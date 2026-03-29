@@ -4,8 +4,15 @@ import sys
 import json
 import re
 import shutil
+import io
 from datetime import datetime
 from collections import defaultdict, OrderedDict
+
+# Windows GBK 终端下强制 UTF-8 输出，避免中文和 emoji 编码错误
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+if sys.stderr.encoding and sys.stderr.encoding.lower() != "utf-8":
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 LBS_TO_KG = 0.453592
 KNOWN_FIELDS = {"weight", "reps", "sets", "distance", "duration", "incline"}
