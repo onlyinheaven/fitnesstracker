@@ -208,7 +208,16 @@ compatibility: 需要 Python 3.x 和文件系统访问权限（用于存储 SQLi
 
 ### 安装/更新/修复 统一流程
 
-安装、更新、修复共用同一套流程。源路径记为 `SOURCE`，目标路径记为 `TARGET`。
+安装、更新、修复共用同一套流程。
+
+**路径定义：**
+- `SOURCE`（源路径）: 本项目的 Git 仓库路径
+  - **Linux / macOS / WSL**: `/mnt/e/workrepo/QClawRepo/fitness-tracker`
+  - **Windows PowerShell**: `E:\workrepo\QClawRepo\fitness-tracker`
+- `TARGET`（目标路径）: 用户的 Skill 安装目录，位于对应工具的 skills 目录下
+  - **Claude Code (Linux / macOS / WSL)**: `~/.claude/skills/fitness-tracker/`
+  - **Claude Code (Windows PowerShell)**: `%USERPROFILE%\.claude\skills\fitness-tracker\`
+  - **其他工具（QClaw、Gemini CLI 等）**: 找到该工具存放 skills 的目录，在其下创建 `fitness-tracker/` 子目录作为 TARGET。通常类似 `~/.工具名/skills/fitness-tracker/`，具体路径参考对应工具的文档。
 
 **核心原则：先拿到大脑，再拿到工具，再用工具干活。**
 
@@ -234,10 +243,6 @@ compatibility: 需要 Python 3.x 和文件系统访问权限（用于存储 SQLi
 
 步骤 4: 完成后重新加载 Skill（使新版本的功能和指令立即生效）
 ```
-
-**Claude Code 默认安装路径：**
-- **Linux / macOS**: `~/.claude/skills/fitness-tracker/`
-- **Windows**: `%USERPROFILE%\.claude\skills\fitness-tracker\`
 
 **示例：**
 ```bash
