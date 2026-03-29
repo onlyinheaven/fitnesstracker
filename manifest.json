@@ -1,11 +1,12 @@
 {
-    "version": "0.6.0",
+    "version": "0.7.0",
     "files": [
         "SKILL.md",
         "VERSION",
         "manifest.json",
         "scripts/fitness_manager.py",
-        "scripts/rest_timer.py"
+        "scripts/rest_timer.py",
+        "scripts/install.py"
     ],
     "directories": [
         "scripts"

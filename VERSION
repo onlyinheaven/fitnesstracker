@@ -1,4 +1,4 @@
-0.6.0
-commit: e4a17b0
+0.7.0
+commit: d6b680a
 date: 2026-03-29
-message: chore: bump version to 0.6.0
+message: docs: 添加提交规范和测试规范到 CLAUDE.md

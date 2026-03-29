@@ -184,13 +184,13 @@ compatibility: 需要 Python 3.x 和文件系统访问权限（用于存储 SQLi
 
 ### 清单驱动机制
 
-所有需要分发的文件由 `manifest.json` 统一管理。安装和更新时，根据此清单决定需要复制哪些文件。
+所有需要分发的文件由 `manifest.json` 统一管理。安装脚本根据此清单自动比较版本并复制文件。
 
 **`manifest.json` 结构：**
 ```json
 {
-    "version": "0.5.0",
-    "files": ["SKILL.md", "VERSION", "manifest.json", "scripts/fitness_manager.py", "scripts/rest_timer.py"],
+    "version": "0.6.0",
+    "files": ["SKILL.md", "VERSION", "manifest.json", "scripts/fitness_manager.py", "scripts/rest_timer.py", "scripts/install.py"],
     "directories": ["scripts"]
 }
 ```
@@ -199,101 +199,26 @@ compatibility: 需要 Python 3.x 和文件系统访问权限（用于存储 SQLi
 
 ---
 
-### 安装/更新流程（面向 Claude 等 AI 工具调用）
+### 安装/更新命令
 
-源路径记为 `SOURCE`，目标安装路径记为 `TARGET`。
+从源路径（即本仓库/skill 所在目录）运行安装脚本：
 
-**步骤：**
-
-1. **读取源 manifest**: 从 `SOURCE/manifest.json` 读取文件清单
-2. **版本比较**: 读取 `SOURCE/VERSION` 第一行和 `TARGET/VERSION` 第一行，比较版本号
-   - 版本一致 → 输出"当前已是最新版本 vX.X.X，无需更新"，跳过
-   - 版本不同或 TARGET 不存在 → 继续安装/更新
-3. **创建目录**: 按 manifest 的 `directories` 在 TARGET 下创建子目录
-4. **复制文件**: 按 manifest 的 `files` 逐个从 SOURCE 复制到 TARGET 对应路径
-5. **确认**: 输出更新完成信息和新版本号
-
-**伪代码：**
-```
-source_manifest = read_json(SOURCE/manifest.json)
-source_version = read_first_line(SOURCE/VERSION)
-target_version = read_first_line(TARGET/VERSION)  # 不存在则为空
-
-if source_version == target_version:
-    print("当前已是最新版本，无需更新")
-    return
-
-for dir in source_manifest.directories:
-    mkdir(TARGET/dir)
-
-for file in source_manifest.files:
-    copy(SOURCE/file, TARGET/file)
-
-print("更新完成: vX.X.X")
+```bash
+python <源路径>/scripts/install.py <目标路径>
 ```
 
----
+脚本自动完成：版本比较 → 版本一致则跳过 → 版本不同则按 manifest 创建目录并复制文件。
 
-### Claude Code 安装路径
-
+**Claude Code 默认安装路径：**
 - **Linux / macOS**: `~/.claude/skills/fitness-tracker/`
 - **Windows**: `%USERPROFILE%\.claude\skills\fitness-tracker\`
 
----
-
-### 手动安装/更新（一键命令）
-
-以下命令从源路径读取 manifest 自动完成安装，适用于直接在终端操作的用户。
-
-**Linux / macOS：**
+**示例：**
 ```bash
-SOURCE="/mnt/e/workrepo/QClawRepo/fitness-tracker"
-TARGET="$HOME/.claude/skills/fitness-tracker"
-python3 -c "
-import json, os, shutil
-src, dst = '$SOURCE', '$TARGET'
-manifest = json.load(open(os.path.join(src, 'manifest.json')))
-src_ver = open(os.path.join(src, 'VERSION')).readline().strip()
-dst_ver_file = os.path.join(dst, 'VERSION')
-dst_ver = open(dst_ver_file).readline().strip() if os.path.exists(dst_ver_file) else ''
-if src_ver == dst_ver:
-    print(f'当前已是最新版本 v{src_ver}，无需更新'); exit()
-for d in manifest.get('directories', []):
-    os.makedirs(os.path.join(dst, d), exist_ok=True)
-for f in manifest['files']:
-    os.makedirs(os.path.dirname(os.path.join(dst, f)) or dst, exist_ok=True)
-    shutil.copy2(os.path.join(src, f), os.path.join(dst, f))
-print(f'安装/更新完成: v{src_ver}')
-"
+python scripts/install.py ~/.claude/skills/fitness-tracker
 ```
 
-**Windows PowerShell：**
-```powershell
-$SOURCE = "E:\workrepo\QClawRepo\fitness-tracker"
-$TARGET = "$env:USERPROFILE\.claude\skills\fitness-tracker"
-python -c @"
-import json, os, shutil
-src, dst = r'$SOURCE', r'$TARGET'
-manifest = json.load(open(os.path.join(src, 'manifest.json')))
-src_ver = open(os.path.join(src, 'VERSION')).readline().strip()
-dst_ver_file = os.path.join(dst, 'VERSION')
-dst_ver = open(dst_ver_file).readline().strip() if os.path.exists(dst_ver_file) else ''
-if src_ver == dst_ver:
-    print(f'当前已是最新版本 v{src_ver}，无需更新'); exit()
-for d in manifest.get('directories', []):
-    os.makedirs(os.path.join(dst, d), exist_ok=True)
-for f in manifest['files']:
-    os.makedirs(os.path.dirname(os.path.join(dst, f)) or dst, exist_ok=True)
-    shutil.copy2(os.path.join(src, f), os.path.join(dst, f))
-print(f'安装/更新完成: v{src_ver}')
-"@
-```
-
----
-
-### 其他工具（Gemini CLI、QClaw 等）
-
-使用上述相同的清单驱动流程，只需将 `TARGET` 替换为对应工具的 Skill 目录即可。
+适用于所有工具（Claude Code、Gemini CLI、QClaw 等），只需将目标路径替换为对应工具的 Skill 目录。
 
 ---
 
