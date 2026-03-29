@@ -1,4 +1,4 @@
 0.3.0
-commit: f5f0434
+commit: 9c4b70d
 date: 2026-03-29
-message: feat: 扩展支持多运动类型、key=value 参数格式及多日查询对比
+message: feat: 添加版本查询功能（version 命令）
