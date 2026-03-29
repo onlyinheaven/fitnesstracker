@@ -1,4 +1,4 @@
-0.3.0
-commit: 9c4b70d
+0.4.0
+commit: e266d9d
 date: 2026-03-29
-message: feat: 添加版本查询功能（version 命令）
+message: fix: 修复 Windows GBK 终端下中文和 emoji 输出编码错误
