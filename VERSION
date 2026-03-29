@@ -1,4 +1,4 @@
-0.5.0
-commit: c1f2f5a
+0.6.0
+commit: 8d25d22
 date: 2026-03-29
-message: chore: bump version to 0.5.0
+message: feat: 清单驱动的安装/更新机制（manifest.json）
