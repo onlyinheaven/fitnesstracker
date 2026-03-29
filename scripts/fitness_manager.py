@@ -193,13 +193,22 @@ def record(exercise, fields):
     cursor = conn.cursor()
     date_str = datetime.now().strftime("%Y-%m-%d")
 
-    # 间歇时间
+    # 间歇时间：先查同动作，再查任意动作（换动作场景）
     cursor.execute('''
-        SELECT timestamp FROM workouts
+        SELECT exercise, timestamp FROM workouts
         WHERE exercise = ? AND date = ?
         ORDER BY timestamp DESC LIMIT 1
     ''', (exercise, date_str))
-    last_row = cursor.fetchone()
+    last_same = cursor.fetchone()
+
+    last_any = None
+    if not last_same:
+        cursor.execute('''
+            SELECT exercise, timestamp FROM workouts
+            WHERE date = ?
+            ORDER BY timestamp DESC LIMIT 1
+        ''', (date_str,))
+        last_any = cursor.fetchone()
 
     now = datetime.now()
     timestamp_str = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -236,12 +245,21 @@ def record(exercise, fields):
 
     print(f"✅ 成功记录: {' | '.join(display_parts)}")
 
-    if last_row:
+    if last_same:
         try:
-            last_dt = datetime.strptime(last_row["timestamp"], "%Y-%m-%d %H:%M:%S")
+            last_dt = datetime.strptime(last_same["timestamp"], "%Y-%m-%d %H:%M:%S")
             diff_seconds = (now - last_dt).total_seconds()
             if diff_seconds > 0:
                 print(f"⏱️ 距离上一组间歇时间: {format_rest_time(diff_seconds)}")
+        except (ValueError, TypeError):
+            pass
+    elif last_any:
+        try:
+            last_dt = datetime.strptime(last_any["timestamp"], "%Y-%m-%d %H:%M:%S")
+            diff_seconds = (now - last_dt).total_seconds()
+            if diff_seconds > 0:
+                prev_name = last_any["exercise"]
+                print(f"⏱️ 距离上一个动作（{prev_name}）间隔时间: {format_rest_time(diff_seconds)}")
         except (ValueError, TypeError):
             pass
 
