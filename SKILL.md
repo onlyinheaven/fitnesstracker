@@ -206,30 +206,34 @@ compatibility: 需要 Python 3.x 和文件系统访问权限（用于存储 SQLi
 
 ---
 
-### 安装/更新流程
+### 安装/更新/修复 统一流程
 
-源路径记为 `SOURCE`（本仓库/skill 源目录），目标路径记为 `TARGET`（用户安装目录）。
+安装、更新、修复共用同一套流程。源路径记为 `SOURCE`，目标路径记为 `TARGET`。
 
-**核心原则：先拿到工具，再用工具干活。**
+**核心原则：先拿到大脑，再拿到工具，再用工具干活。**
 
 ```
-步骤 1: 从 SOURCE 复制 SKILL.md → TARGET（Skill 的核心，始终第一个更新）
+步骤 1: 从 SOURCE 复制 SKILL.md → TARGET
+        → 重新加载 Skill（确保后续步骤按最新指令执行）
 
-步骤 2: 检查 TARGET 是否具备安装工具
-        需要: scripts/install.py, manifest.json
-        如果缺少 → 从 SOURCE 复制到 TARGET（创建 scripts/ 目录如需要）
+步骤 2: 检查 TARGET 是否具备安装所需文件
+        必须文件: scripts/install.py, manifest.json
+        - 文件缺失 → 从 SOURCE 直接复制（创建 scripts/ 目录如需要）
+        - 文件存在但运行报错 → 从 SOURCE 重新复制覆盖
+        直到必须文件就绪后继续
 
-步骤 3: 运行安装脚本完成剩余文件的安装和 MD5 校验
+步骤 3: 运行安装脚本
         python <TARGET>/scripts/install.py <SOURCE> <TARGET>
-```
+        脚本自动完成：
+          1. 复制源 manifest.json 为临时参考文件
+          2. 比对是否需要更新（manifest MD5 比对 + 逐文件校验）
+          3. 从源复制所有文件到目标
+          4. 逐文件 MD5+size 校验确认完整性
+          5. 输出本版本更新日志
+          6. 清理临时文件
 
-安装脚本自动完成：
-1. 复制源 manifest.json 为临时参考文件
-2. 比对是否需要更新（manifest MD5 比对 + 逐文件校验）
-3. 从源复制所有文件到目标
-4. 逐文件 MD5+size 校验确认完整性
-5. 输出本版本更新日志
-6. 清理临时文件
+步骤 4: 完成后重新加载 Skill（使新版本的功能和指令立即生效）
+```
 
 **Claude Code 默认安装路径：**
 - **Linux / macOS**: `~/.claude/skills/fitness-tracker/`
@@ -242,21 +246,15 @@ python scripts/install.py /path/to/source ~/.claude/skills/fitness-tracker
 
 适用于所有工具（Claude Code、Gemini CLI、QClaw 等），只需将目标路径替换为对应工具的 Skill 目录。
 
----
+**触发场景：**
 
-### 修复
+| 用户意图 | 示例表达 |
+|---------|---------|
+| 安装 | "安装 fitness tracker skill" |
+| 更新 | "更新一下这个 skill"、"有新版本吗" |
+| 修复 | "skill 好像坏了"、"修复一下"、"脚本报错了" |
 
-当用户反馈 Skill 功能异常（如脚本报错、文件损坏、功能缺失等），执行修复流程：
-
-```bash
-python <TARGET>/scripts/install.py <SOURCE> <TARGET>
-```
-
-与安装/更新使用同一脚本。脚本会自动逐文件 MD5 校验，仅替换损坏或缺失的文件不会影响用户的 `config.json` 和 `record/` 数据。
-
-如果 `scripts/install.py` 本身损坏或缺失，回退到安装流程的步骤 1-2（从源补齐工具后再运行）。
-
-- **触发**: "skill 好像坏了"、"修复一下 fitness tracker"、"脚本报错了"
+> 修复不会影响用户的 `config.json` 和 `record/` 数据。
 
 ---
 

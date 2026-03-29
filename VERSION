@@ -1,4 +1,4 @@
 0.8.0
-commit: a6360d3
+commit: cdff85a
 date: 2026-03-29
-message: fix: 修复所有脚本的 Windows GBK 编码问题
+message: fix: install.py 补充 Windows GBK 编码修复
