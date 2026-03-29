@@ -1,5 +1,5 @@
 {
-    "version": "0.9.0",
+    "version": "0.10.0",
     "files": [
         {
             "path": "SKILL.md",
@@ -8,8 +8,8 @@
         },
         {
             "path": "VERSION",
-            "md5": "f1bfd6c0d380ee94a17ac9ae08995787",
-            "size": 115
+            "md5": "845f56b78201219d901cc014fcacd558",
+            "size": 164
         },
         {
             "path": "manifest.json",

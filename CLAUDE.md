@@ -80,6 +80,8 @@ There is no linter, build step, or automated test runner. Evaluation cases are i
 - **修复性变更**（fix）：必须升 patch 版本
 - **非功能性变更**（docs、chore、refactor）：不传版本号，仅更新 commit/date/message
 
+> **注意**: SKILL.md 的修改属于 Skill 功能开发（feat），不是普通文档更新。SKILL.md 定义了 AI 的行为逻辑和触发条件，其变更直接影响用户体验，应按功能性变更升 minor 版本。仅 CLAUDE.md、README 等项目内部文档的修改才视为 docs。
+
 ## Manifest 维护
 
 `manifest.json` 记录所有需要分发给用户的文件清单。**以下操作必须同步更新 `manifest.json`：**
