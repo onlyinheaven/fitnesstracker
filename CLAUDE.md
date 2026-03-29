@@ -54,3 +54,14 @@ There is no linter, build step, or automated test runner. Evaluation cases are i
 - **Auto-migration**: detects legacy CSV files and imports into SQLite; also ALTERs old tables to add new columns.
 - **Compare** handles non-identical exercise sets: shows common exercises with diffs, plus exercises unique to each date.
 - Documentation and output strings are in **Chinese**.
+
+## Manifest 维护
+
+`manifest.json` 记录所有需要分发给用户的文件清单。**以下操作必须同步更新 `manifest.json`：**
+
+- 新增需要分发的文件 → 加入 `files` 列表
+- 删除或重命名已分发文件 → 从 `files` 中移除/修改路径
+- 新增需要分发的子目录 → 加入 `directories` 列表
+- `scripts/bump_version.sh` 会自动同步 manifest 中的 `version` 字段
+
+不需要分发的文件（如 `CLAUDE.md`、`evals/`、`scripts/bump_version.sh`、`.gitignore`）列在 `exclude_from_dist` 中仅供参考，不影响安装流程。

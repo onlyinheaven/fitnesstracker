@@ -1,4 +1,4 @@
 0.5.0
-commit: ffdecbf
+commit: c1f2f5a
 date: 2026-03-29
-message: feat: 新增组间歇计时提醒功能（timer 命令）
+message: chore: bump version to 0.5.0
