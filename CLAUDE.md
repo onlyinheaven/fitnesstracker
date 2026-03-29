@@ -28,6 +28,7 @@ python scripts/fitness_manager.py compare 2024-03-20 2024-03-24  # Compare two d
 python scripts/fitness_manager.py delete [动作]                  # Delete last record
 python scripts/fitness_manager.py update "动作" weight=85kg      # Update last record (partial)
 python scripts/fitness_manager.py setpath /new/path --migrate    # Move data
+python scripts/fitness_manager.py version                       # Version + commit info
 python scripts/fitness_manager.py help
 ```
 

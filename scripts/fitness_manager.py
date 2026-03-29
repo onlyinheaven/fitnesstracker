@@ -697,6 +697,42 @@ def set_path(new_path, migrate=False):
     save_config(new_path)
     print(f"✅ 存储路径已更新为: {new_path}")
 
+# ── 版本信息 ──────────────────────────────────────────────
+
+def load_version_info():
+    """从 VERSION 文件读取版本号、commit、日期。格式:
+    0.3.0
+    commit: abc1234
+    date: 2026-03-29
+    """
+    version_file = os.path.join(SKILL_DIR, "VERSION")
+    info = {"version": "unknown", "commit": None, "date": None, "message": None}
+    if not os.path.exists(version_file):
+        return info
+    with open(version_file, "r", encoding="utf-8") as f:
+        lines = [l.strip() for l in f if l.strip()]
+    if lines:
+        info["version"] = lines[0]
+    for line in lines[1:]:
+        if line.startswith("commit:"):
+            info["commit"] = line.split(":", 1)[1].strip()
+        elif line.startswith("date:"):
+            info["date"] = line.split(":", 1)[1].strip()
+        elif line.startswith("message:"):
+            info["message"] = line.split(":", 1)[1].strip()
+    return info
+
+def print_version():
+    """输出版本号、commit、日期和说明（全部来自 VERSION 文件，无需 git）。"""
+    info = load_version_info()
+    print(f"Fitness Tracker v{info['version']}")
+    if info["commit"]:
+        print(f"  commit:  {info['commit']}")
+    if info["date"]:
+        print(f"  date:    {info['date']}")
+    if info["message"]:
+        print(f"  message: {info['message']}")
+
 # ── 用法说明 ──────────────────────────────────────────────
 
 def print_usage():
@@ -712,6 +748,7 @@ def print_usage():
   summary 开始日期 结束日期                查看多日训练总结
   compare 日期1 日期2                      对比两日训练变化
   setpath "新路径" [--migrate]             修改存储路径
+  version                                  查看版本号和 commit 信息
 
 可用字段 (key=value):
   weight=80kg    重量（支持 kg/lbs）
@@ -742,6 +779,9 @@ if __name__ == "__main__":
 
     if action in ("-h", "--help", "help"):
         print_usage()
+        sys.exit(0)
+    elif action in ("version", "--version", "-v"):
+        print_version()
         sys.exit(0)
     elif action == "init":
         log_dir = sys.argv[2] if len(sys.argv) > 2 else DEFAULT_LOG_DIR

@@ -1,6 +1,6 @@
 ---
 name: fitness-tracker
-description: 当用户提及健身、运动相关内容时触发。包括但不限于：记录力量训练（深蹲、卧推、硬拉、引体向上等）、自重训练（悬垂举腿、平板支撑、俯卧撑等）、有氧运动（游泳、跑步、坡道走、骑行等），查看训练报告或总结，询问历史 PR，查询多日训练记录，对比两天的训练变化，删除或修改记录，修改数据存储路径。支持 kg/lbs 双单位、km/m 距离、灵活时长格式。口语化表达如"今天练了XXX"、"帮我记一下"、"看看上次卧推多少"、"这周练了啥"、"对比一下周一和周三"。
+description: 当用户提及健身、运动相关内容时触发。包括但不限于：记录力量训练（深蹲、卧推、硬拉、引体向上等）、自重训练（悬垂举腿、平板支撑、俯卧撑等）、有氧运动（游泳、跑步、坡道走、骑行等），查看训练报告或总结，询问历史 PR，查询多日训练记录，对比两天的训练变化，删除或修改记录，修改数据存储路径。支持 kg/lbs 双单位、km/m 距离、灵活时长格式。口语化表达如"今天练了XXX"、"帮我记一下"、"看看上次卧推多少"、"这周练了啥"、"对比一下周一和周三"、"这个skill是什么版本"。
 compatibility: 需要 Python 3.x 和文件系统访问权限（用于存储 SQLite 数据库）
 ---
 
@@ -77,6 +77,11 @@ compatibility: 需要 Python 3.x 和文件系统访问权限（用于存储 SQLi
 ### 8. 修改存储路径 (Set Path)
 - **从头开始**: `python scripts/fitness_manager.py setpath "新路径"`
 - **迁移数据**: `python scripts/fitness_manager.py setpath "新路径" --migrate`
+
+### 9. 版本查询 (Version)
+- **调用**: `python scripts/fitness_manager.py version`
+- **触发**: "这个skill是什么版本"、"fitness tracker版本号"、"当前版本"
+- **功能**: 输出当前版本号、对应的 commit 哈希、发布日期和更新说明。
 
 ## 脚本路径引用
 脚本位于 SKILL.md 同级目录下的 `scripts/fitness_manager.py`。
@@ -174,6 +179,7 @@ compatibility: 需要 Python 3.x 和文件系统访问权限（用于存储 SQLi
 ```
 fitness-tracker/
 ├── SKILL.md                        # Skill 定义文件（必须）
+├── VERSION                         # 版本信息文件（必须）
 └── scripts/
     └── fitness_manager.py          # 核心脚本（必须）
 ```
@@ -194,6 +200,7 @@ Claude Code 的 Skill 目录：
 ```bash
 mkdir -p ~/.claude/skills/fitness-tracker/scripts
 cp /mnt/e/workrepo/QClawRepo/fitness-tracker/SKILL.md ~/.claude/skills/fitness-tracker/
+cp /mnt/e/workrepo/QClawRepo/fitness-tracker/VERSION ~/.claude/skills/fitness-tracker/
 cp /mnt/e/workrepo/QClawRepo/fitness-tracker/scripts/fitness_manager.py ~/.claude/skills/fitness-tracker/scripts/
 ```
 
@@ -201,6 +208,7 @@ cp /mnt/e/workrepo/QClawRepo/fitness-tracker/scripts/fitness_manager.py ~/.claud
 ```cmd
 mkdir %USERPROFILE%\.claude\skills\fitness-tracker\scripts
 copy /Y E:\workrepo\QClawRepo\fitness-tracker\SKILL.md %USERPROFILE%\.claude\skills\fitness-tracker\
+copy /Y E:\workrepo\QClawRepo\fitness-tracker\VERSION %USERPROFILE%\.claude\skills\fitness-tracker\
 copy /Y E:\workrepo\QClawRepo\fitness-tracker\scripts\fitness_manager.py %USERPROFILE%\.claude\skills\fitness-tracker\scripts\
 ```
 
@@ -208,6 +216,7 @@ copy /Y E:\workrepo\QClawRepo\fitness-tracker\scripts\fitness_manager.py %USERPR
 ```powershell
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills\fitness-tracker\scripts"
 Copy-Item "E:\workrepo\QClawRepo\fitness-tracker\SKILL.md" "$env:USERPROFILE\.claude\skills\fitness-tracker\" -Force
+Copy-Item "E:\workrepo\QClawRepo\fitness-tracker\VERSION" "$env:USERPROFILE\.claude\skills\fitness-tracker\" -Force
 Copy-Item "E:\workrepo\QClawRepo\fitness-tracker\scripts\fitness_manager.py" "$env:USERPROFILE\.claude\skills\fitness-tracker\scripts\" -Force
 ```
 
