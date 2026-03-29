@@ -4,6 +4,9 @@ config.json
 # 用户数据目录
 record/
 
+# 测试临时目录
+tmp/
+
 # 计时器运行时文件
 .timer_pid
 .timer_alert

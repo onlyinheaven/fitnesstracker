@@ -55,6 +55,10 @@ There is no linter, build step, or automated test runner. Evaluation cases are i
 - **Compare** handles non-identical exercise sets: shows common exercises with diffs, plus exercises unique to each date.
 - Documentation and output strings are in **Chinese**.
 
+## 提交规范
+
+每次 `git commit` 之前，必须先运行 `bash scripts/bump_version.sh` 更新 VERSION 和 manifest.json 中的版本信息（commit hash、日期、message）。如果是功能性变更，传入新版本号（如 `bash scripts/bump_version.sh 0.7.0`）；如果只是小修改，不传参数保留当前版本号。然后将 `VERSION` 和 `manifest.json` 一并加入本次提交。
+
 ## Manifest 维护
 
 `manifest.json` 记录所有需要分发给用户的文件清单。**以下操作必须同步更新 `manifest.json`：**
@@ -65,3 +69,12 @@ There is no linter, build step, or automated test runner. Evaluation cases are i
 - `scripts/bump_version.sh` 会自动同步 manifest 中的 `version` 字段
 
 不需要分发的文件（如 `CLAUDE.md`、`evals/`、`scripts/bump_version.sh`、`.gitignore`）列在 `exclude_from_dist` 中仅供参考，不影响安装流程。
+
+## 测试规范
+
+**禁止在用户真实数据库上做测试。** 所有测试临时文件统一放在项目路径下的 `tmp/` 目录中（已在 `.gitignore` 中排除）。
+
+具体做法：
+1. 测试前：`python scripts/fitness_manager.py init tmp/test`
+2. 执行测试操作
+3. 测试后：`python scripts/fitness_manager.py init record` 恢复配置，并 `rm -rf tmp/`
