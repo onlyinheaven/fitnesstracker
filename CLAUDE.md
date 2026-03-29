@@ -66,7 +66,19 @@ There is no linter, build step, or automated test runner. Evaluation cases are i
 
 ## 提交规范
 
-每次 `git commit` 之前，必须先运行 `bash scripts/bump_version.sh` 更新 VERSION 和 manifest.json 中的版本信息（commit hash、日期、message）。如果是功能性变更，传入新版本号（如 `bash scripts/bump_version.sh 0.7.0`）；如果只是小修改，不传参数保留当前版本号。然后将 `VERSION` 和 `manifest.json` 一并加入本次提交。
+每次 `git commit` 之前，必须先运行 `bash scripts/bump_version.sh` 更新 VERSION 和 manifest.json 中的版本信息（commit hash、日期、message）。然后将 `VERSION` 和 `manifest.json` 一并加入本次提交。
+
+**版本号规则（语义化版本 X.Y.Z）：**
+
+| 变更类型 | 版本位 | 示例 | bump 命令 |
+|---------|--------|------|-----------|
+| 新功能、新脚本、新命令 | minor (Y) | 0.9.0 → 0.10.0 | `bash scripts/bump_version.sh 0.10.0` |
+| bug 修复、编码修复 | patch (Z) | 0.9.0 → 0.9.1 | `bash scripts/bump_version.sh 0.9.1` |
+| 文档、注释、格式调整 | 不升版本 | 0.9.0 不变 | `bash scripts/bump_version.sh` |
+
+- **功能性变更**（feat）：必须升 minor 版本
+- **修复性变更**（fix）：必须升 patch 版本
+- **非功能性变更**（docs、chore、refactor）：不传版本号，仅更新 commit/date/message
 
 ## Manifest 维护
 

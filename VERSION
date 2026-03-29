@@ -1,4 +1,4 @@
 0.9.0
-commit: c2ec278
+commit: 265baba
 date: 2026-03-29
-message: feat: 新增强制更新模式 (--force)
+message: chore: bump version to 0.9.0
