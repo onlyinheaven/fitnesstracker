@@ -4,11 +4,10 @@
     {
       "id": 1,
       "prompt": "今天卧推 80kg 做了 8 个，做了 4 组",
-      "expected_output": "调用 fitness_manager.py record 记录卧推数据，然后自动调用 analyze 展示训练报告",
+      "expected_output": "调用 record 记录卧推数据（key=value 格式），然后自动调用 analyze 展示训练报告",
       "files": [],
       "expectations": [
-        "调用了 fitness_manager.py record 命令记录卧推数据",
-        "记录的参数包含: 卧推, 80kg, 8, 4",
+        "调用了 record 命令，参数包含 weight=80kg reps=8 sets=4",
         "记录成功后自动调用了 analyze 命令展示卧推训练报告",
         "输出中包含记录成功的确认信息"
       ]
@@ -19,9 +18,9 @@
       "expected_output": "依次记录深蹲和硬拉，每次记录后调用 analyze，最后调用 summary 展示每日报告",
       "files": [],
       "expectations": [
-        "调用了 fitness_manager.py record 记录深蹲 100kg 8次 3组",
-        "调用了 fitness_manager.py record 记录硬拉 120kg 5次 3组",
-        "调用了 fitness_manager.py summary 展示每日训练报告",
+        "调用了 record 记录深蹲 weight=100kg reps=8 sets=3",
+        "调用了 record 记录硬拉 weight=120kg reps=5 sets=3",
+        "调用了 summary 展示每日训练报告",
         "输出中包含深蹲和硬拉两个动作的总结信息"
       ]
     },
@@ -31,10 +30,53 @@
       "expected_output": "先调用 delete 删除卧推最后一条记录，再调用 record 重新记录新数据",
       "files": [],
       "expectations": [
-        "调用了 fitness_manager.py delete 卧推 删除最后一条卧推记录",
-        "调用了 fitness_manager.py record 重新记录卧推 85kg 6次 3组",
-        "输出中包含删除成功的确认信息",
-        "输出中包含新记录成功的确认信息"
+        "调用了 delete 卧推 删除最后一条卧推记录",
+        "调用了 record 重新记录卧推 weight=85kg reps=6 sets=3",
+        "输出中包含删除成功和新记录成功的确认信息"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "今天做了 3 组悬垂举腿，每组 12 个",
+      "expected_output": "调用 record 记录自重训练（不传 weight 字段），然后调用 analyze",
+      "files": [],
+      "expectations": [
+        "调用了 record \"悬垂举腿\" reps=12 sets=3，没有传 weight 字段",
+        "记录成功后输出中显示"自重"",
+        "调用了 analyze 展示训练报告"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "今天游泳游了 1.8 公里，用了 40 分钟",
+      "expected_output": "调用 record 记录游泳数据（distance + duration），然后调用 analyze",
+      "files": [],
+      "expectations": [
+        "调用了 record \"游泳\" distance=1.8km duration=40min",
+        "输出中包含 1.8km 和 40min",
+        "调用了 analyze 展示游泳训练报告"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "帮我看看 2024-03-20 到 2024-03-24 的训练记录",
+      "expected_output": "调用 summary 并传入开始和结束日期，展示多日训练汇总",
+      "files": [],
+      "expectations": [
+        "调用了 summary 2024-03-20 2024-03-24",
+        "输出中按日期分组显示每天的训练内容",
+        "输出中包含总结统计信息"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "对比一下 3 月 20 号和 3 月 24 号的训练",
+      "expected_output": "调用 compare 对比两日训练，展示共同项目变化和仅某日项目",
+      "files": [],
+      "expectations": [
+        "调用了 compare 2024-03-20 2024-03-24",
+        "输出中包含共同训练项目的变化对比",
+        "输出中列出仅某一天有的训练项目"
       ]
     }
   ]
